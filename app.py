@@ -215,14 +215,7 @@ if "similarity" in st.session_state:
     similarity = st.session_state.similarity
 
     st.write("### Paper Similarity")
-    st.write(f"Similarity Score: **{similarity}%**")
-
-    if "similarity" in st.session_state:
-
-        similarity = st.session_state.similarity
-
-    st.write("### Paper Similarity")
-    st.write(f"Similarity Score: **{similarity}%**")
+    st.write(f"Similarity Score:  **{similarity}%**")
 
     if similarity > 70:
         st.error("High similarity detected ⚠️ Possible plagiarism")
