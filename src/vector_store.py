@@ -20,17 +20,24 @@ def build_vector_store(embeddings, chunks):
     index.add(np.array(embeddings))
 
     documents = chunks
-    
-def search(query_embedding, k=3):
+
+def search(query_embedding, top_k=3):
 
     global index
     global chunks
 
+    if index is None or len(chunks) == 0:
+        return []
+
     distances, indices = index.search(
         np.array([query_embedding]),
-        k
+        min(top_k, len(chunks))
     )
 
-    results = [chunks[i] for i in indices[0]]
+    results = []
+
+    for i in indices[0]:
+        if i >= 0 and i < len(chunks):
+            results.append(chunks[i])
 
     return results

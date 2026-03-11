@@ -170,31 +170,31 @@ if "related_work" in st.session_state:
 # -----------------------------
 # Ask Question (RAG)
 # -----------------------------
-if uploaded_files:
+st.divider()
 
-    st.divider()
+question = st.text_input(
+    "Ask a question about the uploaded documents",
+    key="question_input"
+)
 
-    question = st.text_input(
-        "Ask a question about the uploaded documents",
-        key="question_input"
-    )
+if st.button("Ask Question"):
 
-    if st.button("Ask Question"):
+    if question:
 
-        if question:
+        with st.spinner("Searching documents..."):
 
-            with st.spinner("Searching documents..."):
+            query_embedding = embed_query(question)
 
-                query_embedding = embed_query(question)
-
-                results = search(query_embedding)
+            results = search(query_embedding, top_k=3)
 
             if results:
 
                 context = "\n".join(results)
 
                 prompt = f"""
-Answer the question using the document context.
+You are a research assistant.
+
+Use the document context to answer the question.
 
 Context:
 {context}
@@ -203,17 +203,25 @@ Question:
 {question}
 """
 
-                st.session_state.answer = run_llm(prompt)
-
             else:
-                st.session_state.answer = "No relevant information found."
 
-# display answer persistently
+                prompt = f"""
+You are a research assistant.
+
+Answer the question based on your knowledge.
+
+Question:
+{question}
+"""
+
+            answer = run_llm(prompt)
+
+            st.session_state.answer = answer
+
+
 if "answer" in st.session_state:
-
     st.write("### Answer")
     st.write(st.session_state.answer)
-
 # -----------------------------
 # Paper Similarity
 # -----------------------------
