@@ -45,3 +45,8 @@ A Yuv Raj
 Charanya S
 Dhanush Gowda N A
 Lakshmi
+
+
+## Improvements
+- Improved performance by caching document processing
+- Optimized retrieval using top-k search
