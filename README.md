@@ -50,3 +50,7 @@ Lakshmi
 ## Improvements
 - Improved performance by caching document processing
 - Optimized retrieval using top-k search
+
+## Bug Fix
+- Fixed duplicate similarity output in paper comparison
+- Used session_state to prevent repeated display
