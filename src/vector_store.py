@@ -5,10 +5,13 @@ index = None
 chunks = []
 
 
-def build_vector_store(embeddings, texts):
+def build_vector_store(embeddings, chunks):
 
     global index
-    global chunks
+    global documents
+
+    if len(embeddings) == 0:
+        return
 
     dimension = len(embeddings[0])
 
@@ -16,9 +19,8 @@ def build_vector_store(embeddings, texts):
 
     index.add(np.array(embeddings))
 
-    chunks = texts
-
-
+    documents = chunks
+    
 def search(query_embedding, k=3):
 
     global index

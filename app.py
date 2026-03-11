@@ -33,9 +33,11 @@ def process_documents(uploaded_files):
 
         all_chunks.extend(chunks)
 
-    embeddings = create_embeddings(all_chunks)
+    if all_chunks:
 
-    build_vector_store(embeddings, all_chunks)
+        embeddings = create_embeddings(all_chunks)
+
+        build_vector_store(embeddings, all_chunks)
 
     return all_papers_text
 
