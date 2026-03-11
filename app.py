@@ -12,6 +12,48 @@ from src.chunker import chunk_text
 from src.llm_fallback import run_llm
 from src.paper_similarity import compute_similarity
 
+# -----------------------------------
+# CACHE DOCUMENT PROCESSING
+# -----------------------------------
+@st.cache_resource
+def process_documents(uploaded_files):
+
+    all_chunks = []
+    all_papers_text = []
+
+    for file in uploaded_files:
+
+        file.seek(0)
+
+        text = extract_text_from_pdf(file)
+
+        all_papers_text.append(text)
+
+        chunks = chunk_text(text)
+
+        all_chunks.extend(chunks)
+
+    embeddings = create_embeddings(all_chunks)
+
+    build_vector_store(embeddings, all_chunks)
+
+    return all_papers_text
+
+# -------------------------------
+# CACHE SUMMARY
+# -------------------------------
+@st.cache_data
+def cached_summary(text):
+    return summarize_paper(text)
+
+@st.cache_data
+def cached_citations(text):
+    return extract_citations(text)
+
+@st.cache_data
+def cached_bibtex(text):
+    return generate_bibtex(text)
+
 
 # -----------------------------
 # Check Ollama Status
@@ -64,26 +106,10 @@ st.sidebar.write(f"📄 Papers Loaded: {len(uploaded_files)}")
 # -----------------------------
 if uploaded_files:
 
-    all_chunks = []
-    all_papers_text = []
-
-    for file in uploaded_files:
-
-        file.seek(0)
-
-        text = extract_text_from_pdf(file)
-
-        all_papers_text.append(text)
-
-        chunks = chunk_text(text)
-
-        all_chunks.extend(chunks)
-
-    embeddings = create_embeddings(all_chunks)
-
-    build_vector_store(embeddings, all_chunks)
+    all_papers_text = process_documents(uploaded_files)
 
     st.success("Documents processed and vector database created")
+
 
     st.divider()
 
@@ -101,21 +127,21 @@ if uploaded_files:
 
         # Summary
         with st.spinner("Generating summary..."):
-            summary = summarize_paper(text)
+            summary = cached_summary(text)
 
         st.write("### Summary")
         st.write(summary)
 
         # Citations
         with st.spinner("Extracting citations..."):
-            citations = extract_citations(text)
+            citations = cached_citations(text)
 
         st.write("### Citations Found")
         st.write(citations)
 
         # BibTeX (AUTOMATIC)
         with st.spinner("Generating BibTeX..."):
-            bibtex = generate_bibtex(text)
+            bibtex = cached_bibtex(text)
 
         st.write("### BibTeX Citation")
         st.code(bibtex)
